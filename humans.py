@@ -39,25 +39,25 @@ class Player(object):
         return deck[0]
 
     def play_card(self, card1, card2):
-        print('Which card do you want to play? you have: %s and %s' % (card1, card2))
-        player_move = input('Please pick one\n')
-        player_move = self.is_valid_move(player_move, card1, card2)
-        if player_move == card1:
-            return card1
-        else:
-            return card2
+        is_valid = False
+        while not is_valid:
+            print('Which card do you want to play? you have: %s and %s' % (card1, card2))
+            player_move = int(input('Please pick one\n'))
+            is_valid = self.is_valid_move(player_move, card1, card2)
+        return player_move
 
     def is_valid_move(self, player_move, card1, card2):
         if player_move == 8:
-            player_move = input("Invalid move, you can't discard an 8! try again\n")
-            return player_move
+            # TODO Once have names of cards change messages to include card names
+            print("Oops! Can't discard the human card (8)! Try again...")
+            return False
         elif (card1 == 7 and card2 in (5, 6) and player_move == card2) or \
              (card2 == 7 and card1 in (5, 6) and player_move == card1):
-            player_move = input("Invalid move, you can only discard  a 7 now! try again\n")
-            return player_move
+            # TODO Once have names of cards change messages to include card names
+            print("Oops! Can't discard 5 or 6 when you have a 7!")
+            return False
         else:
-            return player_move
-
+            return True
 
     def update_hand(self, card1, card2, discarded):
         if discarded[0] == card1:
