@@ -18,15 +18,43 @@ class Game(object):
         deck.pop(0)
         return deck
 
+    def do_card_action(self, card_played, current_player):
+        list_self_excluded = [player for player in self.list_of_available_players() if player is not current_player]
+        if card_played == 1:
+            chosen_player = input('Which player do you want to play this card on? options: %s\n'
+                                    % ", ".join([player.name for player in list_self_excluded]))
+            attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+            guessed_card = int(input('Which card do you think %s has?\n' % chosen_player))
+            if attacked_player.card_num1 == guessed_card:
+                attacked_player.is_in_game = False
+                print("%s is out of the game!" % attacked_player.name)
+                # TODO add ELSE what happens if wrong? nothing i think. think about it 
+
+
+
+    def list_of_available_players(self):
+        return [player for player in self.players_list if player.is_in_game and not player.is_in_safe_mode]
+
+    def identify_player_by_name(self, active_players_list, name):
+        return [player for player in active_players_list if player.name == name][0]
+
+    def check_for_winner(self, active_players_list):
+        active_players = [player for player in active_players_list if player.is_in_game]
+        if len(active_players)==1:
+            print("%s won the game!" % active_players[0].name)
+            #TODO need to break our of the loop once a winner is declared
+
+
+
     # def name_players(self):
     #     for player in self.players_list:
 
 
-    def announce_winner(self, card1, card2):
+    def announce_winner(self, name1, card1, name2, card2):
         if card1>card2:
-            print('Player 1 won!')
+            print('%s  won!' % name1)
         else:
-            print('Player 2 won!')
+            print('%s  won!' % name2)
 
 class Player(object):
     def __init__(self):
@@ -34,6 +62,8 @@ class Player(object):
         self.card_num1 = None
         self.card_num2 = None
         self.discarded = []
+        self.is_in_safe_mode = False
+        self.is_in_game = True
 
     def draw_card(self, deck):
         return deck[0]
@@ -92,15 +122,18 @@ if len(humans.deck) == 15:
         player.card_num1 = player.draw_card(humans.deck)
         humans.update_deck(humans.deck)
         print(humans.deck)
+# print(humans.list_of_available_players())
 while len(humans.deck) > 0:
     for player in humans.players_list:
         player.card_num2 = player.draw_card(humans.deck)
         humans.update_deck(humans.deck)
         # print(player.card_num1,player.card_num2)
         player_move = player.play_card()
+        humans.do_card_action(player_move, player)
         player.discarded.insert(0, player_move)
         player.update_hand()
+        humans.check_for_winner(humans.players_list)
         print(humans.deck)
         if len(humans.deck) == 0:
             break
-humans.announce_winner(player1.card_num1, player2.card_num1)
+humans.announce_winner(player1.name, player1.card_num1, player2.name, player2.card_num1)
