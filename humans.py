@@ -24,11 +24,20 @@ class Game(object):
             chosen_player = input('Which player do you want to play this card on? options: %s\n'
                                     % ", ".join([player.name for player in list_self_excluded]))
             attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
-            guessed_card = int(input('Which card do you think %s has?\n' % chosen_player))
+            is_valid_guess = False
+            while not is_valid_guess:
+                guessed_card = int(input('Which card do you think %s has?\n' % chosen_player))
+                if guessed_card == 1:
+                    print("Oops! Can't guess a 1! Try again")
+                    is_valid_guess = False
+                else:
+                    break
             if attacked_player.card_num1 == guessed_card:
                 attacked_player.is_in_game = False
                 print("%s is out of the game!" % attacked_player.name)
-                # TODO add ELSE what happens if wrong? nothing i think. think about it 
+            else:
+                print('sorry, %s, your guess is wrong' % current_player.name)
+                # TODO add ELSE what happens if wrong? nothing i think. think about it
 
 
 
@@ -42,7 +51,9 @@ class Game(object):
         active_players = [player for player in active_players_list if player.is_in_game]
         if len(active_players)==1:
             print("%s won the game!" % active_players[0].name)
-            #TODO need to break our of the loop once a winner is declared
+            return False
+        else:
+            return True
 
 
 
@@ -123,7 +134,8 @@ if len(humans.deck) == 15:
         humans.update_deck(humans.deck)
         print(humans.deck)
 # print(humans.list_of_available_players())
-while len(humans.deck) > 0:
+does_game_continue = True
+while len(humans.deck) > 0 and does_game_continue:
     for player in humans.players_list:
         player.card_num2 = player.draw_card(humans.deck)
         humans.update_deck(humans.deck)
@@ -132,8 +144,11 @@ while len(humans.deck) > 0:
         humans.do_card_action(player_move, player)
         player.discarded.insert(0, player_move)
         player.update_hand()
-        humans.check_for_winner(humans.players_list)
+        if not humans.check_for_winner(humans.players_list):
+            does_game_continue = False
+            break
         print(humans.deck)
         if len(humans.deck) == 0:
             break
-humans.announce_winner(player1.name, player1.card_num1, player2.name, player2.card_num1)
+if len(humans.deck) == 0:
+    humans.announce_winner(player1.name, player1.card_num1, player2.name, player2.card_num1)
