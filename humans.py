@@ -38,6 +38,11 @@ class Game(object):
             else:
                 print('sorry, %s, your guess is wrong' % current_player.name)
                 # TODO add ELSE what happens if wrong? nothing i think. think about it
+        elif card_played == 2:
+            chosen_player = input('Which player do you want to play this card on? options: %s\n'
+                                  % ", ".join([player.name for player in list_self_excluded]))
+            attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+            print("%s's card is %s" % (attacked_player.name, attacked_player.card_num1))
 
 
 
