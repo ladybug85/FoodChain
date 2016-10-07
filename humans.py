@@ -49,10 +49,13 @@ class Game(object):
     def list_of_available_players(self):
         return [player for player in self.players_list if player.is_in_game and not player.is_in_safe_mode]
 
+    def list_of_active_players(self):
+        return [player for player in self.players_list if player.is_in_game]
+
     def identify_player_by_name(self, active_players_list, name):
         return [player for player in active_players_list if player.name == name][0]
 
-    def check_for_winner(self, active_players_list):
+    def check_for_last_standing_winner(self, active_players_list):
         active_players = [player for player in active_players_list if player.is_in_game]
         if len(active_players)==1:
             print("%s won the game!" % active_players[0].name)
@@ -61,16 +64,12 @@ class Game(object):
             return True
 
 
-
-    # def name_players(self):
-    #     for player in self.players_list:
-
-
-    def announce_winner(self, name1, card1, name2, card2):
-        if card1>card2:
-            print('%s  won!' % name1)
-        else:
-            print('%s  won!' % name2)
+    # TODO fix this method to decide on a winner from a list with len >1
+    def compare_cards(self):
+        active_players = self.list_of_active_players()
+        sorted_active_players = sorted(active_players, key=lambda x: x.card_num1, reverse=True)
+        print("%s's card is the highest!" % sorted_active_players[0].name)
+        return sorted_active_players[0]
 
 class Player(object):
     def __init__(self):
@@ -149,11 +148,12 @@ while len(humans.deck) > 0 and does_game_continue:
         humans.do_card_action(player_move, player)
         player.discarded.insert(0, player_move)
         player.update_hand()
-        if not humans.check_for_winner(humans.players_list):
+        if not humans.check_for_last_standing_winner(humans.players_list):
             does_game_continue = False
             break
         print(humans.deck)
         if len(humans.deck) == 0:
             break
 if len(humans.deck) == 0:
-    humans.announce_winner(player1.name, player1.card_num1, player2.name, player2.card_num1)
+    print("%s won the game!" % humans.compare_cards().name)l
+    m
