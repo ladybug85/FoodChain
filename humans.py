@@ -23,12 +23,10 @@ class Game(object):
             return None
         else:
             if card_played == 1:
-                chosen_player = input('Which player do you want to play this card on? options: \n%s\n'
-                                    % ", ".join([player.name for player in list_self_excluded]))
-                attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+                attacked_player = self.choose_player_to_attack(list_self_excluded)
                 is_valid_guess = False
                 while not is_valid_guess:
-                    guessed_card = int(input('Which card do you think %s has?\n' % chosen_player))
+                    guessed_card = int(input('Which card do you think %s has?\n' % attacked_player.name))
                     if guessed_card == 1:
                         print("Oops! Can't guess a 1! Try again")
                         is_valid_guess = False
@@ -41,15 +39,11 @@ class Game(object):
                     print('sorry, %s, your guess is wrong' % current_player.name)
                     # TODO add ELSE what happens if wrong? nothing i think. think about it
             elif card_played == 2:
-                chosen_player = input('Which player do you want to play this card on? options: \n%s\n'
-                                  % ", ".join([player.name for player in list_self_excluded]))
-                attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+                attacked_player = self.choose_player_to_attack(list_self_excluded)
                 print("%s's card is %s" % (attacked_player.name, attacked_player.card_num1))
                 self.update_deck()
             elif card_played == 3:
-                chosen_player = input('Which player do you want to play this card on? options: \n%s\n'
-                                  % ", ".join([player.name for player in list_self_excluded]))
-                attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+                attacked_player = self.choose_player_to_attack(list_self_excluded)
                 winner_of_comparison = self.compare_cards([current_player, attacked_player])
                 if winner_of_comparison == current_player:
                     attacked_player.is_in_game = False
@@ -60,21 +54,17 @@ class Game(object):
                 print('%s is now in safe mode' % current_player.name)
             elif card_played == 5:
                 list_self_excluded.append(current_player)
-                chosen_player = input('Which player do you want to play this card on? options: \n%s\n'
-                                      % ", ".join([player.name for player in list_self_excluded]))
-                attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+                attacked_player = self.choose_player_to_attack(list_self_excluded)
                 if attacked_player == current_player:
                     if current_player.card_num1 == card_played and current_player.card_num2 != 8:
                         print('%s forced discarded a %s' % (current_player.name, current_player.card_num2))
                         current_player.discarded.append(current_player.card_num2)
                         current_player.card_num2 = current_player.draw_card(self.deck)
-                        print('%s new card is %s' % (current_player.name, current_player.card_num2))
                         self.update_deck()
                     elif current_player.card_num2 == card_played and current_player.card_num1 != 8:
                         print('%s forced discarded a %s' % (current_player.name, current_player.card_num1))
                         current_player.discarded.append(current_player.card_num1)
                         current_player.card_num1 = current_player.draw_card(self.deck)
-                        print('%s new card is %s' % (current_player.name, current_player.card_num1))
                         self.update_deck()
                     else:
                         print('Silly you! You have just committed suicide!')
@@ -89,9 +79,7 @@ class Game(object):
                         attacked_player.card_num1 = attacked_player.draw_card(self.deck)
                         self.update_deck()
             elif card_played == 6:
-                chosen_player = input('Which player do you want to play this card on? options: \n%s\n'
-                                      % ", ".join([player.name for player in list_self_excluded]))
-                attacked_player = self.identify_player_by_name(list_self_excluded, chosen_player)
+                attacked_player = self.choose_player_to_attack(list_self_excluded)
                 current_get_this_card = attacked_player.card_num1
                 if card_played == current_player.card_num1:
                     attacked_player.card_num1 = current_player.card_num2
@@ -99,6 +87,11 @@ class Game(object):
                 else:
                     attacked_player.card_num1 = current_player.card_num1
                     current_player.card_num1 = current_get_this_card
+
+    def choose_player_to_attack(self, list_to_choose_from):
+        chosen_player = input('Which player do you want to play this card on? options: \n%s\n'
+                              % ", ".join([player.name for player in list_to_choose_from]))
+        return self.identify_player_by_name(list_to_choose_from, chosen_player)
 
     def list_of_available_players(self):
         for player in self.players_list:
